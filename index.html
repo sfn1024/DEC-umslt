@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Decryption System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .login-screen {
+            text-align: center;
+        }
+
+        .lock-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .main-screen {
+            display: none;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input.error-input {
+            border-color: #ff4444;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .error-msg {
+            color: #ff4444;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        .result-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-label {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .result-value {
+            color: #333;
+            font-size: 24px;
+            font-weight: 700;
+            word-break: break-all;
+            margin-bottom: 15px;
+        }
+
+        .discount-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .discount-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .discount-btn.m-btn {
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .discount-btn.e-btn {
+            color: #3498db;
+            border-color: #3498db;
+        }
+
+        .discount-btn.s-btn {
+            color: #2ecc71;
+            border-color: #2ecc71;
+        }
+
+        .discount-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .discount-btn.m-btn:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .discount-btn.e-btn:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .discount-btn.s-btn:hover {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .discount-result {
+            margin-top: 15px;
+            padding: 12px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .discount-result.show {
+            display: block;
+        }
+
+        .discount-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .discount-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2ecc71;
+        }
+
+        .error {
+            background: #ffe6e6;
+            border-left-color: #ff4444;
+        }
+
+        .error .result-label {
+            color: #ff4444;
+        }
+
+        .error .result-value {
+            color: #cc0000;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .warning {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #fff3cd;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #856404;
+        }
+
+        .rules {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff9e6;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .rules h3 {
+            color: #f39c12;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .rules ul {
+            margin-left: 20px;
+        }
+
+        .rules li {
+            margin-bottom: 5px;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="login-screen">
+            <div class="lock-icon">🔒</div>
+            <h1>Secure Access Required</h1>
+            <p class="subtitle">Enter PIN to access the decryption system</p>
+
+            <div class="input-group">
+                <label for="pinInput">PIN Code:</label>
+                <input type="password" id="pinInput" placeholder="Enter PIN" autocomplete="off">
+            </div>
+
+            <button class="btn" onclick="verifyPin()">Unlock System</button>
+            <div id="loginError" class="error-msg"></div>
+        </div>
+
+        <!-- Main Screen -->
+        <div id="mainScreen" class="main-screen">
+            <button class="logout-btn" onclick="logout()">Logout</button>
+            
+            <h1>🔐 Code Decryption System</h1>
+            <p class="subtitle">Enter encrypted code to decrypt</p>
+
+            <div class="input-group">
+                <label for="encryptedCode">Encrypted Code:</label>
+                <input type="text" id="encryptedCode" placeholder="e.g., zurichbank, udm, hcdalazu" autocomplete="off">
+            </div>
+
+            <button class="btn" onclick="decrypt()">Decrypt Code</button>
+
+            <div id="resultBox" class="result-box">
+                <div class="result-label">Decrypted Result:</div>
+                <div id="resultValue" class="result-value"></div>
+                <div id="warningMsg" class="warning" style="display: none;"></div>
+                
+                <div id="discountSection" style="display: none;">
+                    <div class="result-label" style="margin-top: 15px;">Apply Discount:</div>
+                    <div class="discount-buttons">
+                        <button class="discount-btn m-btn" onclick="applyDiscount(25)">M - 25%</button>
+                        <button class="discount-btn e-btn" onclick="applyDiscount(22)">E - 22%</button>
+                        <button class="discount-btn s-btn" onclick="applyDiscount(19)">S - 19%</button>
+                    </div>
+                    <div id="discountResult" class="discount-result">
+                        <div class="discount-label">Final Amount:</div>
+                        <div class="discount-value" id="discountValue"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rules">
+                <h3>📋 Decryption Rules</h3>
+                <ul>
+                    <li><strong>zurichbank</strong> → 1,2,3,4,5,6,7,8,9 (z=1, u=2, r=3, i=4, c=5, h=6, b=7, a=8, n=9)</li>
+                    <li><strong>k, y, v, j</strong> → 0</li>
+                    <li><strong>d</strong> → doubles the previous digit (zd=11, rd=33, id=44)</li>
+                    <li><strong>M, E, S</strong> → Apply 25%, 22%, 19% discount (click buttons)</li>
+                    <li><strong>Unknown characters</strong> → Ignored from that point onwards</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CORRECT_PIN = '2587387';
+        let isAuthenticated = false;
+
+        const decryptionMap = {
+            'z': '1', 'u': '2', 'r': '3', 'i': '4', 'c': '5',
+            'h': '6', 'b': '7', 'a': '8', 'n': '9',
+            'k': '0', 'y': '0', 'v': '0', 'j': '0'
+        };
+
+        let currentAmount = 0;
+
+        function verifyPin() {
+            const pinInput = document.getElementById('pinInput');
+            const loginError = document.getElementById('loginError');
+            const enteredPin = pinInput.value.trim();
+
+            if (enteredPin === CORRECT_PIN) {
+                isAuthenticated = true;
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainScreen').style.display = 'block';
+                loginError.classList.remove('show');
+                pinInput.classList.remove('error-input');
+            } else {
+                loginError.textContent = '❌ Incorrect PIN. Please try again.';
+                loginError.classList.add('show');
+                pinInput.classList.add('error-input');
+                pinInput.value = '';
+                
+                setTimeout(() => {
+                    pinInput.classList.remove('error-input');
+                }, 500);
+            }
+        }
+
+        function logout() {
+            isAuthenticated = false;
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('pinInput').value = '';
+            document.getElementById('encryptedCode').value = '';
+            document.getElementById('resultBox').classList.remove('show');
+            document.getElementById('loginError').classList.remove('show');
+        }
+
+        function decrypt() {
+            if (!isAuthenticated) {
+                return;
+            }
+
+            const input = document.getElementById('encryptedCode').value.trim();
+            const resultBox = document.getElementById('resultBox');
+            const resultValue = document.getElementById('resultValue');
+            const warningMsg = document.getElementById('warningMsg');
+            const discountSection = document.getElementById('discountSection');
+            const discountResult = document.getElementById('discountResult');
+
+            if (!input) {
+                showError('Please enter an encrypted code');
+                return;
+            }
+
+            try {
+                let result = '';
+                let i = 0;
+                let ignoredChars = '';
+                let stopped = false;
+
+                while (i < input.length) {
+                    const char = input[i];
+                    const charLower = char.toLowerCase();
+                    const nextChar = input[i + 1];
+
+                    // Check if current character is 'd' at the start
+                    if (charLower === 'd' && result === '') {
+                        ignoredChars = input.substring(i);
+                        stopped = true;
+                        break;
+                    }
+
+                    // Check if next character is 'd' (double)
+                    if (nextChar && nextChar.toLowerCase() === 'd') {
+                        const digit = decryptionMap[charLower];
+                        
+                        if (!digit) {
+                            // Unknown character before 'd', stop processing
+                            ignoredChars = input.substring(i);
+                            stopped = true;
+                            break;
+                        }
+
+                        // Double the digit
+                        result += digit + digit;
+                        i += 2; // Skip both characters
+                    } else {
+                        // Regular decryption
+                        const decoded = decryptionMap[charLower];
+                        
+                        if (decoded === undefined) {
+                            // Unknown character, stop processing
+                            ignoredChars = input.substring(i);
+                            stopped = true;
+                            break;
+                        }
+
+                        result += decoded;
+                        i++;
+                    }
+                }
+
+                if (result === '') {
+                    showError('No valid characters found to decrypt');
+                    return;
+                }
+
+                currentAmount = parseInt(result);
+                showResult(result);
+
+                // Show warning if characters were ignored
+                if (stopped && ignoredChars) {
+                    warningMsg.textContent = `⚠️ Ignored characters: "${ignoredChars}"`;
+                    warningMsg.style.display = 'block';
+                } else {
+                    warningMsg.style.display = 'none';
+                }
+
+                // Show discount buttons
+                discountSection.style.display = 'block';
+                discountResult.classList.remove('show');
+
+            } catch (error) {
+                showError('Decryption failed: ' + error.message);
+            }
+        }
+
+        function applyDiscount(percentage) {
+            const discountAmount = currentAmount * (percentage / 100);
+            const finalAmount = currentAmount - discountAmount;
+            
+            const discountResult = document.getElementById('discountResult');
+            const discountValue = document.getElementById('discountValue');
+            
+            discountValue.textContent = `${finalAmount.toFixed(2)} (${percentage}% off from ${currentAmount})`;
+            discountResult.classList.add('show');
+        }
+
+        function showResult(result) {
+            const resultBox = document.getElementById('resultBox');
+            const resultValue = document.getElementById('resultValue');
+
+            resultBox.classList.remove('error');
+            resultBox.classList.add('show');
+            resultValue.textContent = result;
+        }
+
+        function showError(message) {
+            const resultBox = document.getElementById('resultBox');
+            const resultValue = document.getElementById('resultValue');
+            const warningMsg = document.getElementById('warningMsg');
+            const discountSection = document.getElementById('discountSection');
+
+            resultBox.classList.add('error', 'show');
+            resultValue.textContent = message;
+            warningMsg.style.display = 'none';
+            discountSection.style.display = 'none';
+        }
+
+        // Allow Enter key for PIN entry
+        document.getElementById('pinInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyPin();
+            }
+        });
+
+        // Allow Enter key to decrypt
+        document.getElementById('encryptedCode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                decrypt();
+            }
+        });
+    </script>
+</body>
+</html>
